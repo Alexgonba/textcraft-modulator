@@ -12,9 +12,10 @@ import {
 import { 
   Type, Heading1, Heading2, Heading3, List, ListOrdered, 
   CheckSquare, Quote, Code, Image, Youtube, Twitch, Instagram, 
-  Gamepad2, Minus, Layout, Book, Dices
+  Gamepad2, Minus, Layout, Book, Dices, Chess, Swords, Target
 } from 'lucide-react';
 import { BlockType } from './EditorContext';
+import { useGame } from './GameContext';
 
 interface SlashMenuProps {
   position: { x: number; y: number };
@@ -28,6 +29,7 @@ interface MenuOption {
   type: BlockType;
   description: string;
   moduleType?: string;
+  gameId?: string; // Associated game ID
 }
 
 // Base block options available for all types of content
@@ -55,32 +57,36 @@ const mediaOptions: MenuOption[] = [
 // Game-specific module options
 const gameModuleOptions: MenuOption[] = [
   { 
-    icon: <Gamepad2 size={18} />, 
+    icon: <Chess size={18} />, 
     label: 'TFT Team Comp Builder', 
     type: 'module', 
     description: 'Insert TFT team builder module',
-    moduleType: 'tft-builder'
+    moduleType: 'tft-builder',
+    gameId: 'tft'
   },
   { 
-    icon: <Layout size={18} />, 
+    icon: <Swords size={18} />, 
     label: 'LoL Champions Overview', 
     type: 'module', 
     description: 'Insert League of Legends champion overview',
-    moduleType: 'lol-champions'
+    moduleType: 'lol-champions',
+    gameId: 'lol'
   },
   { 
-    icon: <Book size={18} />, 
+    icon: <Target size={18} />, 
     label: 'Valorant Agent Guide', 
     type: 'module', 
     description: 'Insert Valorant agent guide module',
-    moduleType: 'valorant-agents'
+    moduleType: 'valorant-agents',
+    gameId: 'valorant'
   },
   { 
     icon: <Dices size={18} />, 
     label: 'Baldur\'s Gate Character Builder', 
     type: 'module', 
     description: 'Insert BG3 character builder module',
-    moduleType: 'bg3-builder'
+    moduleType: 'bg3-builder',
+    gameId: 'bg3'
   },
 ];
 
@@ -88,9 +94,21 @@ const SlashMenu: React.FC<SlashMenuProps> = ({ position, onSelect, onClose }) =>
   const [query, setQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
   const menuRef = useRef<HTMLDivElement>(null);
+  const { selectedGame } = useGame();
 
-  // Filter options based on search query
+  // Filter options based on search query and selected game
   const filterOptions = (options: MenuOption[]) => {
+    // For game modules, filter by selected game and query
+    if (options === gameModuleOptions) {
+      return options.filter(option => 
+        // Only show modules for the selected game or all if no game selected
+        (!selectedGame || option.gameId === selectedGame.id) &&
+        (option.label.toLowerCase().includes(query.toLowerCase()) ||
+        option.description.toLowerCase().includes(query.toLowerCase()))
+      );
+    }
+    
+    // For other options, just filter by query
     return options.filter(option => 
       option.label.toLowerCase().includes(query.toLowerCase()) ||
       option.description.toLowerCase().includes(query.toLowerCase())
@@ -217,7 +235,7 @@ const SlashMenu: React.FC<SlashMenuProps> = ({ position, onSelect, onClose }) =>
           {filteredGameModules.length > 0 && (
             <>
               <CommandSeparator />
-              <CommandGroup heading="Game Modules">
+              <CommandGroup heading={selectedGame ? `${selectedGame.name} Modules` : "Game Modules"}>
                 {filteredGameModules.map((option, index) => 
                   renderMenuItem(option, index + filteredBaseOptions.length + filteredMediaOptions.length)
                 )}
