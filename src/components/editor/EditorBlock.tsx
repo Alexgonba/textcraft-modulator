@@ -1,3 +1,4 @@
+
 import React, { useRef, useState, useEffect } from 'react';
 import { useEditor, BlockType, EditorBlock as EditorBlockType } from './EditorContext';
 import { 
@@ -40,6 +41,7 @@ const EditorBlock: React.FC<EditorBlockProps> = ({
   const [showFormatToolbar, setShowFormatToolbar] = useState(false);
   const [formatToolbarPosition, setFormatToolbarPosition] = useState({ x: 0, y: 0 });
   const [showPlusButton, setShowPlusButton] = useState(false);
+  const [isHovering, setIsHovering] = useState(false);
 
   useEffect(() => {
     if (contentRef.current && block.id === focusedBlockId) {
@@ -126,10 +128,35 @@ const EditorBlock: React.FC<EditorBlockProps> = ({
     document.execCommand(format);
   };
 
+  const handlePlusButtonClick = () => {
+    const rect = blockRef.current?.getBoundingClientRect() || { left: 0, bottom: 0 };
+    setSlashMenuPosition({
+      x: rect.left,
+      y: rect.bottom + window.scrollY + 10
+    });
+    setShowSlashMenu(true);
+  };
+
+  // Determine which module to render based on moduleType
+  const renderModule = () => {
+    switch(block.moduleType) {
+      case 'tft-builder':
+        return <TFTTeamBuilder blockId={block.id} moduleData={block.moduleData} />;
+      case 'lol-champions':
+        return <div className="p-4 bg-secondary rounded-lg text-center">LoL Champions Overview Module (Coming Soon)</div>;
+      case 'valorant-agents':
+        return <div className="p-4 bg-secondary rounded-lg text-center">Valorant Agents Guide Module (Coming Soon)</div>;
+      case 'bg3-builder':
+        return <div className="p-4 bg-secondary rounded-lg text-center">Baldur's Gate Character Builder (Coming Soon)</div>;
+      default:
+        return <div className="p-4 bg-secondary rounded-lg text-center">Unknown module type</div>;
+    }
+  };
+
   const renderBlockContent = () => {
     switch (block.type) {
       case 'module':
-        return <TFTTeamBuilder blockId={block.id} moduleData={block.moduleData} />;
+        return renderModule();
       case 'divider':
         return <hr className="my-4 border-border" />;
       case 'check-list':
@@ -137,7 +164,7 @@ const EditorBlock: React.FC<EditorBlockProps> = ({
           <div className="flex items-start gap-2">
             <button 
               onClick={() => toggleCheckListItem(block.id)}
-              className="mt-1 text-muted-foreground hover:text-primary transition-colors"
+              className="mt-1.5 text-muted-foreground hover:text-primary transition-colors"
             >
               {block.checked ? <Check size={16} /> : <div className="w-4 h-4 border border-muted-foreground rounded" />}
             </button>
@@ -217,8 +244,14 @@ const EditorBlock: React.FC<EditorBlockProps> = ({
         onDragStart={handleDragStart}
         onDragOver={handleDragOver}
         onDrop={handleDrop}
-        onMouseEnter={() => setShowPlusButton(true)}
-        onMouseLeave={() => setShowPlusButton(false)}
+        onMouseEnter={() => {
+          setShowPlusButton(true);
+          setIsHovering(true);
+        }}
+        onMouseLeave={() => {
+          setShowPlusButton(false);
+          setIsHovering(false);
+        }}
       >
         <div className="editor-block-menu">
           <div className="flex flex-col items-center gap-1">
@@ -245,6 +278,18 @@ const EditorBlock: React.FC<EditorBlockProps> = ({
           {renderBlockContent()}
         </div>
 
+        <div 
+          className={`absolute right-2 top-1/2 transform -translate-y-1/2 ${isHovering ? 'opacity-100' : 'opacity-0'} transition-opacity`}
+        >
+          <button 
+            className="p-1 rounded-full bg-primary text-primary-foreground hover:bg-primary/80 transition-colors"
+            onClick={handlePlusButtonClick}
+            title="Add content"
+          >
+            <Plus size={16} />
+          </button>
+        </div>
+
         {showFormatToolbar && (
           <TextFormatToolbar
             position={formatToolbarPosition}
@@ -267,14 +312,7 @@ const EditorBlock: React.FC<EditorBlockProps> = ({
         {showPlusButton && (
           <button
             className="editor-plus-menu-button"
-            onClick={() => {
-              const rect = blockRef.current?.getBoundingClientRect() || { left: 0, bottom: 0 };
-              setSlashMenuPosition({
-                x: rect.left,
-                y: rect.bottom + window.scrollY + 10
-              });
-              setShowSlashMenu(true);
-            }}
+            onClick={handlePlusButtonClick}
           >
             <Plus size={16} />
           </button>
@@ -284,8 +322,13 @@ const EditorBlock: React.FC<EditorBlockProps> = ({
       {showSlashMenu && (
         <SlashMenu
           position={slashMenuPosition}
-          onSelect={(type) => {
-            if (type === 'module' || type === 'divider') {
+          onSelect={(type, moduleType) => {
+            if (type === 'module') {
+              // For module types, we need to create a new block with the specific module type
+              const afterId = block.id;
+              addBlock('module', afterId);
+              // Note: We would need to update addBlock in EditorContext to handle moduleType
+            } else if (type === 'divider') {
               addBlock(type, block.id);
             } else {
               handleSlashMenuSelect(type);

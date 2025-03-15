@@ -24,7 +24,6 @@ export interface EditorBlock {
   moduleType?: string;
   moduleData?: any;
   checked?: boolean;
-  toggleCheckListItem?: (id: string) => void;
 }
 
 interface EditorContextType {
@@ -32,9 +31,9 @@ interface EditorContextType {
   focusedBlockId: string | null;
   setFocusedBlockId: (id: string | null) => void;
   updateBlockContent: (id: string, content: string) => void;
-  addBlock: (type: BlockType, afterId?: string) => void;
+  addBlock: (type: BlockType, afterId?: string, moduleType?: string) => void;
   deleteBlock: (id: string) => void;
-  changeBlockType: (id: string, newType: BlockType) => void;
+  changeBlockType: (id: string, newType: BlockType, moduleType?: string) => void;
   moveBlockUp: (id: string) => void;
   moveBlockDown: (id: string) => void;
   reorderBlocks: (startIndex: number, endIndex: number) => void;
@@ -49,12 +48,12 @@ const initialBlocks: EditorBlock[] = [
   {
     id: uuidv4(),
     type: 'heading-1',
-    content: 'Welcome to TextCraft Modulator',
+    content: 'Welcome to MultiGame Editor',
   },
   {
     id: uuidv4(),
     type: 'paragraph',
-    content: 'This is a modern, feature-rich text editor with a modular system that allows you to add custom modules like the TFT Team Comp Builder.',
+    content: 'This is a versatile, feature-rich text editor with a modular system that supports multiple games and content types.',
   },
   {
     id: uuidv4(),
@@ -64,7 +63,7 @@ const initialBlocks: EditorBlock[] = [
   {
     id: uuidv4(),
     type: 'paragraph',
-    content: 'Click anywhere to start typing, or use the + button between blocks to add new content.',
+    content: 'Click anywhere to start typing, or use the + button to add new content.',
   },
   {
     id: uuidv4(),
@@ -84,20 +83,17 @@ const initialBlocks: EditorBlock[] = [
   {
     id: uuidv4(),
     type: 'heading-2',
-    content: 'Special Modules',
+    content: 'Game Modules',
   },
   {
     id: uuidv4(),
     type: 'paragraph',
-    content: 'Try out the TFT Team Comp Builder module by clicking the + button and selecting "TFT Team Comp Builder".',
+    content: 'Try out different game modules by clicking the + button or using the slash command. Each game has its own specific modules.',
   },
 ];
 
 export const EditorProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [blocks, setBlocks] = useState<EditorBlock[]>(initialBlocks.map(block => ({
-    ...block,
-    toggleCheckListItem: (id: string) => toggleCheckListItem(id)
-  })));
+  const [blocks, setBlocks] = useState<EditorBlock[]>(initialBlocks);
   const [focusedBlockId, setFocusedBlockId] = useState<string | null>(null);
 
   const updateBlockContent = useCallback((id: string, content: string) => {
@@ -108,14 +104,42 @@ export const EditorProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     );
   }, []);
 
-  const addBlock = useCallback((type: BlockType, afterId?: string) => {
+  const toggleCheckListItem = useCallback((id: string) => {
+    setBlocks(prevBlocks => 
+      prevBlocks.map(block => 
+        block.id === id ? { ...block, checked: !block.checked } : block
+      )
+    );
+  }, []);
+
+  const addBlock = useCallback((type: BlockType, afterId?: string, moduleType?: string) => {
+    // Set default moduleData based on moduleType
+    let defaultModuleData;
+    if (type === 'module') {
+      switch(moduleType) {
+        case 'tft-builder':
+          defaultModuleData = { champions: [], synergies: [] };
+          break;
+        case 'lol-champions':
+          defaultModuleData = { champions: [], roles: [] };
+          break;
+        case 'valorant-agents':
+          defaultModuleData = { agents: [], roles: [] };
+          break;
+        case 'bg3-builder':
+          defaultModuleData = { character: {}, abilities: [] };
+          break;
+        default:
+          defaultModuleData = {};
+      }
+    }
+
     const newBlock: EditorBlock = {
       id: uuidv4(),
       type,
       content: '',
-      moduleType: type === 'module' ? 'tft-builder' : undefined,
-      moduleData: type === 'module' ? { champions: [], synergies: [] } : undefined,
-      toggleCheckListItem: (id: string) => toggleCheckListItem(id)
+      moduleType: type === 'module' ? moduleType || 'tft-builder' : undefined,
+      moduleData: type === 'module' ? defaultModuleData : undefined,
     };
 
     setBlocks(prevBlocks => {
@@ -134,7 +158,7 @@ export const EditorProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     setTimeout(() => {
       setFocusedBlockId(newBlock.id);
     }, 0);
-  }, [toggleCheckListItem]);
+  }, []);
 
   const deleteBlock = useCallback((id: string) => {
     setBlocks(prevBlocks => {
@@ -155,11 +179,45 @@ export const EditorProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     });
   }, []);
 
-  const changeBlockType = useCallback((id: string, newType: BlockType) => {
+  const changeBlockType = useCallback((id: string, newType: BlockType, moduleType?: string) => {
     setBlocks(prevBlocks => 
-      prevBlocks.map(block => 
-        block.id === id ? { ...block, type: newType } : block
-      )
+      prevBlocks.map(block => {
+        if (block.id === id) {
+          // If changing to a module type, set appropriate moduleType and data
+          if (newType === 'module') {
+            let defaultModuleData;
+            const actualModuleType = moduleType || 'tft-builder';
+            
+            switch(actualModuleType) {
+              case 'tft-builder':
+                defaultModuleData = { champions: [], synergies: [] };
+                break;
+              case 'lol-champions':
+                defaultModuleData = { champions: [], roles: [] };
+                break;
+              case 'valorant-agents':
+                defaultModuleData = { agents: [], roles: [] };
+                break;
+              case 'bg3-builder':
+                defaultModuleData = { character: {}, abilities: [] };
+                break;
+              default:
+                defaultModuleData = {};
+            }
+            
+            return { 
+              ...block, 
+              type: newType,
+              moduleType: actualModuleType,
+              moduleData: defaultModuleData
+            };
+          }
+          
+          // Otherwise just change the type
+          return { ...block, type: newType };
+        }
+        return block;
+      })
     );
   }, []);
 
@@ -198,14 +256,6 @@ export const EditorProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       result.splice(endIndex, 0, removed);
       return result;
     });
-  }, []);
-
-  const toggleCheckListItem = useCallback((id: string) => {
-    setBlocks(prevBlocks => 
-      prevBlocks.map(block => 
-        block.id === id ? { ...block, checked: !block.checked } : block
-      )
-    );
   }, []);
 
   const updateModuleData = useCallback((id: string, moduleData: any) => {
