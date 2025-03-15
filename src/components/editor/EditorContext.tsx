@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useCallback } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -15,7 +16,8 @@ export type BlockType =
   | 'image'
   | 'video'
   | 'module'
-  | 'divider';
+  | 'divider'
+  | 'showSlashMenu'; // Special type for UX only, not a real block type
 
 export interface EditorBlock {
   id: string;
@@ -78,7 +80,7 @@ const initialBlocks: EditorBlock[] = [
   {
     id: uuidv4(),
     type: 'bullet-list',
-    content: 'Drag and drop blocks to reorder them.',
+    content: 'Try the new contextual editing - when a line is empty, a small menu will appear.',
   },
   {
     id: uuidv4(),
@@ -115,6 +117,7 @@ export const EditorProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const addBlock = useCallback((type: BlockType, afterId?: string, moduleType?: string) => {
     // Set default moduleData based on moduleType
     let defaultModuleData;
+    
     if (type === 'module') {
       switch(moduleType) {
         case 'tft-builder':
@@ -132,14 +135,28 @@ export const EditorProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         default:
           defaultModuleData = {};
       }
+    } else if (type === 'video') {
+      switch(moduleType) {
+        case 'youtube':
+          defaultModuleData = { videoId: '', title: '' };
+          break;
+        case 'twitch':
+          defaultModuleData = { channelId: '' };
+          break;
+        case 'instagram':
+          defaultModuleData = { postId: '' };
+          break;
+        default:
+          defaultModuleData = {};
+      }
     }
 
     const newBlock: EditorBlock = {
       id: uuidv4(),
       type,
       content: '',
-      moduleType: type === 'module' ? moduleType || 'tft-builder' : undefined,
-      moduleData: type === 'module' ? defaultModuleData : undefined,
+      moduleType: (type === 'module' || type === 'video') ? moduleType : undefined,
+      moduleData: (type === 'module' || type === 'video') ? defaultModuleData : undefined,
     };
 
     setBlocks(prevBlocks => {
@@ -200,6 +217,33 @@ export const EditorProvider: React.FC<{ children: React.ReactNode }> = ({ childr
                 break;
               case 'bg3-builder':
                 defaultModuleData = { character: {}, abilities: [] };
+                break;
+              default:
+                defaultModuleData = {};
+            }
+            
+            return { 
+              ...block, 
+              type: newType,
+              moduleType: actualModuleType,
+              moduleData: defaultModuleData
+            };
+          }
+          
+          // If changing to a video type
+          if (newType === 'video') {
+            let defaultModuleData;
+            const actualModuleType = moduleType || 'youtube';
+            
+            switch(actualModuleType) {
+              case 'youtube':
+                defaultModuleData = { videoId: '', title: '' };
+                break;
+              case 'twitch':
+                defaultModuleData = { channelId: '' };
+                break;
+              case 'instagram':
+                defaultModuleData = { postId: '' };
                 break;
               default:
                 defaultModuleData = {};

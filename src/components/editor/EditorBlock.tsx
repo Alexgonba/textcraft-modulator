@@ -1,4 +1,3 @@
-
 import React, { useRef, useState, useEffect } from 'react';
 import { useEditor, BlockType, EditorBlock as EditorBlockType } from './EditorContext';
 import { 
@@ -7,6 +6,7 @@ import {
 } from 'lucide-react';
 import TextFormatToolbar from './TextFormatToolbar';
 import SlashMenu from './SlashMenu';
+import FloatingMenu from './FloatingMenu';
 import TFTTeamBuilder from '../modules/TFTTeamBuilder';
 
 interface EditorBlockProps {
@@ -42,6 +42,9 @@ const EditorBlock: React.FC<EditorBlockProps> = ({
   const [formatToolbarPosition, setFormatToolbarPosition] = useState({ x: 0, y: 0 });
   const [showPlusButton, setShowPlusButton] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
+  const [isEmptyBlock, setIsEmptyBlock] = useState(block.content.trim() === '');
+  const [showFloatingMenu, setShowFloatingMenu] = useState(false);
+  const [floatingMenuPosition, setFloatingMenuPosition] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
     if (contentRef.current && block.id === focusedBlockId) {
@@ -55,12 +58,26 @@ const EditorBlock: React.FC<EditorBlockProps> = ({
         selection.removeAllRanges();
         selection.addRange(range);
       }
+      
+      const isEmpty = contentRef.current.textContent?.trim() === '';
+      setIsEmptyBlock(isEmpty);
+      
+      if (isEmpty) {
+        const rect = contentRef.current.getBoundingClientRect();
+        setFloatingMenuPosition({
+          x: rect.left + 20,
+          y: rect.top - 10,
+        });
+        setShowFloatingMenu(true);
+      }
     }
   }, [focusedBlockId, block.id]);
 
   const handleContentChange = (e: React.FormEvent<HTMLDivElement>) => {
     const content = e.currentTarget.textContent || '';
     updateBlockContent(block.id, content);
+    
+    setIsEmptyBlock(content.trim() === '');
 
     if (content === '/') {
       const rect = e.currentTarget.getBoundingClientRect();
@@ -86,6 +103,14 @@ const EditorBlock: React.FC<EditorBlockProps> = ({
         y: rect.bottom + window.scrollY
       });
       setShowSlashMenu(true);
+    } else if (e.key === 'Escape') {
+      setShowFloatingMenu(false);
+      setShowFormatToolbar(false);
+      setShowSlashMenu(false);
+    } else {
+      if (isEmptyBlock && e.key !== 'ArrowUp' && e.key !== 'ArrowDown') {
+        setShowFloatingMenu(false);
+      }
     }
   };
 
@@ -103,12 +128,23 @@ const EditorBlock: React.FC<EditorBlockProps> = ({
     onDrop();
   };
 
-  const handleSlashMenuSelect = (type: BlockType) => {
-    changeBlockType(block.id, type);
-    setShowSlashMenu(false);
-    setTimeout(() => {
-      setFocusedBlockId(block.id);
-    }, 0);
+  const handleSlashMenuSelect = (type: BlockType, moduleType?: string) => {
+    if (type === 'showSlashMenu') {
+      const rect = contentRef.current?.getBoundingClientRect() || { left: 0, bottom: 0 };
+      setSlashMenuPosition({
+        x: rect.left,
+        y: rect.bottom + window.scrollY
+      });
+      setShowSlashMenu(true);
+      setShowFloatingMenu(false);
+    } else {
+      changeBlockType(block.id, type, moduleType);
+      setShowSlashMenu(false);
+      setShowFloatingMenu(false);
+      setTimeout(() => {
+        setFocusedBlockId(block.id);
+      }, 0);
+    }
   };
 
   const handleMouseUp = () => {
@@ -137,7 +173,31 @@ const EditorBlock: React.FC<EditorBlockProps> = ({
     setShowSlashMenu(true);
   };
 
-  // Determine which module to render based on moduleType
+  const handleFocus = () => {
+    setFocusedBlockId(block.id);
+    
+    if ((contentRef.current?.textContent || '').trim() === '') {
+      setIsEmptyBlock(true);
+      const rect = contentRef.current?.getBoundingClientRect() || { left: 0, top: 0 };
+      setFloatingMenuPosition({
+        x: rect.left + 20,
+        y: rect.top - 10
+      });
+      setShowFloatingMenu(true);
+    } else {
+      setIsEmptyBlock(false);
+      setShowFloatingMenu(false);
+    }
+  };
+
+  const handleBlur = (e: React.FocusEvent) => {
+    if (e.relatedTarget && e.relatedTarget.closest('.floating-menu')) {
+      return;
+    }
+    
+    setShowFloatingMenu(false);
+  };
+
   const renderModule = () => {
     switch(block.moduleType) {
       case 'tft-builder':
@@ -148,6 +208,12 @@ const EditorBlock: React.FC<EditorBlockProps> = ({
         return <div className="p-4 bg-secondary rounded-lg text-center">Valorant Agents Guide Module (Coming Soon)</div>;
       case 'bg3-builder':
         return <div className="p-4 bg-secondary rounded-lg text-center">Baldur's Gate Character Builder (Coming Soon)</div>;
+      case 'youtube':
+        return <div className="p-4 bg-secondary rounded-lg text-center">YouTube Video Embed (Coming Soon)</div>;
+      case 'twitch':
+        return <div className="p-4 bg-secondary rounded-lg text-center">Twitch Stream Embed (Coming Soon)</div>;
+      case 'instagram':
+        return <div className="p-4 bg-secondary rounded-lg text-center">Instagram Post Embed (Coming Soon)</div>;
       default:
         return <div className="p-4 bg-secondary rounded-lg text-center">Unknown module type</div>;
     }
@@ -175,7 +241,8 @@ const EditorBlock: React.FC<EditorBlockProps> = ({
               className="outline-none flex-1"
               onInput={handleContentChange}
               onKeyDown={handleKeyDown}
-              onFocus={() => setFocusedBlockId(block.id)}
+              onFocus={handleFocus}
+              onBlur={handleBlur}
               onMouseUp={handleMouseUp}
               dangerouslySetInnerHTML={{ __html: block.content }}
             />
@@ -190,7 +257,8 @@ const EditorBlock: React.FC<EditorBlockProps> = ({
             className="outline-none w-full"
             onInput={handleContentChange}
             onKeyDown={handleKeyDown}
-            onFocus={() => setFocusedBlockId(block.id)}
+            onFocus={handleFocus}
+            onBlur={handleBlur}
             onMouseUp={handleMouseUp}
             dangerouslySetInnerHTML={{ __html: block.content }}
           />
@@ -290,6 +358,15 @@ const EditorBlock: React.FC<EditorBlockProps> = ({
           </button>
         </div>
 
+        {showFloatingMenu && isEmptyBlock && (
+          <FloatingMenu
+            position={floatingMenuPosition}
+            onSelect={handleSlashMenuSelect}
+            onClose={() => setShowFloatingMenu(false)}
+            isEmptyLine={true}
+          />
+        )}
+
         {showFormatToolbar && (
           <TextFormatToolbar
             position={formatToolbarPosition}
@@ -324,14 +401,12 @@ const EditorBlock: React.FC<EditorBlockProps> = ({
           position={slashMenuPosition}
           onSelect={(type, moduleType) => {
             if (type === 'module') {
-              // For module types, we need to create a new block with the specific module type
               const afterId = block.id;
-              addBlock('module', afterId);
-              // Note: We would need to update addBlock in EditorContext to handle moduleType
-            } else if (type === 'divider') {
-              addBlock(type, block.id);
+              addBlock('module', afterId, moduleType);
+            } else if (type === 'divider' || type === 'video') {
+              addBlock(type, block.id, moduleType);
             } else {
-              handleSlashMenuSelect(type);
+              handleSlashMenuSelect(type, moduleType);
             }
             setShowSlashMenu(false);
           }}

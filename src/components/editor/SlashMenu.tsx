@@ -47,9 +47,9 @@ const baseBlockOptions: MenuOption[] = [
 
 // Media embed options
 const mediaOptions: MenuOption[] = [
-  { icon: <Youtube size={18} />, label: 'YouTube', type: 'video', description: 'Embed a YouTube video' },
-  { icon: <Twitch size={18} />, label: 'Twitch', type: 'video', description: 'Embed a Twitch stream' },
-  { icon: <Instagram size={18} />, label: 'Instagram', type: 'video', description: 'Embed Instagram content' },
+  { icon: <Youtube size={18} />, label: 'YouTube', type: 'video', description: 'Embed a YouTube video', moduleType: 'youtube' },
+  { icon: <Twitch size={18} />, label: 'Twitch', type: 'video', description: 'Embed a Twitch stream', moduleType: 'twitch' },
+  { icon: <Instagram size={18} />, label: 'Instagram', type: 'video', description: 'Embed Instagram content', moduleType: 'instagram' },
 ];
 
 // Game-specific module options

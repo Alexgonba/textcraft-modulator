@@ -8,7 +8,7 @@ const Index = () => {
         <div className="container max-w-5xl mx-auto px-4">
           <h1 className="text-3xl font-bold text-gradient">TextCraft Modulator</h1>
           <p className="text-muted-foreground">
-            A modern, extensible text editor with modular capabilities
+            A modern, extensible text editor with modular capabilities for multiple games
           </p>
         </div>
       </header>
