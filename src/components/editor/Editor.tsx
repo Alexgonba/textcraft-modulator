@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { EditorProvider, useEditor } from './EditorContext';
 import EditorBlock from './EditorBlock';
 import { Card, CardContent } from '@/components/ui/card';
@@ -8,7 +8,7 @@ import { Save, PlusCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 const EditorContent = () => {
-  const { blocks, addBlock } = useEditor();
+  const { blocks, addBlock, reorderBlocks } = useEditor();
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [dropTargetIndex, setDropTargetIndex] = useState<number | null>(null);
   const { toast } = useToast();
@@ -28,9 +28,6 @@ const EditorContent = () => {
 
   const handleDrop = () => {
     if (draggedIndex !== null && dropTargetIndex !== null && draggedIndex !== dropTargetIndex) {
-      // Logic for reordering will be implemented by context's reorderBlocks
-      // which will update the actual state
-      const { reorderBlocks } = useEditor();
       reorderBlocks(draggedIndex, dropTargetIndex);
     }
     setDraggedIndex(null);
