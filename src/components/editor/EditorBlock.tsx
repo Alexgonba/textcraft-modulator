@@ -1,4 +1,3 @@
-
 import React, { useRef, useState, useEffect } from 'react';
 import { useEditor, BlockType, EditorBlock as EditorBlockType } from './EditorContext';
 import { 
@@ -30,7 +29,8 @@ const EditorBlock: React.FC<EditorBlockProps> = ({
     updateBlockContent, 
     deleteBlock,
     changeBlockType,
-    addBlock
+    addBlock,
+    toggleCheckListItem
   } = useEditor();
   
   const contentRef = useRef<HTMLDivElement>(null);
@@ -41,12 +41,10 @@ const EditorBlock: React.FC<EditorBlockProps> = ({
   const [formatToolbarPosition, setFormatToolbarPosition] = useState({ x: 0, y: 0 });
   const [showPlusButton, setShowPlusButton] = useState(false);
 
-  // Set up contentEditable
   useEffect(() => {
     if (contentRef.current && block.id === focusedBlockId) {
       contentRef.current.focus();
       
-      // Place cursor at the end
       const range = document.createRange();
       range.selectNodeContents(contentRef.current);
       range.collapse(false);
@@ -62,7 +60,6 @@ const EditorBlock: React.FC<EditorBlockProps> = ({
     const content = e.currentTarget.textContent || '';
     updateBlockContent(block.id, content);
 
-    // Check for slash command
     if (content === '/') {
       const rect = e.currentTarget.getBoundingClientRect();
       setSlashMenuPosition({
@@ -139,7 +136,7 @@ const EditorBlock: React.FC<EditorBlockProps> = ({
         return (
           <div className="flex items-start gap-2">
             <button 
-              onClick={() => block.toggleCheckListItem && block.toggleCheckListItem(block.id)}
+              onClick={() => toggleCheckListItem(block.id)}
               className="mt-1 text-muted-foreground hover:text-primary transition-colors"
             >
               {block.checked ? <Check size={16} /> : <div className="w-4 h-4 border border-muted-foreground rounded" />}
@@ -174,7 +171,6 @@ const EditorBlock: React.FC<EditorBlockProps> = ({
     }
   };
 
-  // Determine styling based on block type
   const getBlockStyling = () => {
     switch (block.type) {
       case 'heading-1':
@@ -263,7 +259,6 @@ const EditorBlock: React.FC<EditorBlockProps> = ({
         )}
       </div>
 
-      {/* Block separator with + button */}
       <div 
         className="editor-block-separator h-2 relative" 
         onMouseEnter={() => setShowPlusButton(true)}

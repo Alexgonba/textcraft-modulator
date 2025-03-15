@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useCallback } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -25,6 +24,7 @@ export interface EditorBlock {
   moduleType?: string;
   moduleData?: any;
   checked?: boolean;
+  toggleCheckListItem?: (id: string) => void;
 }
 
 interface EditorContextType {
@@ -94,7 +94,10 @@ const initialBlocks: EditorBlock[] = [
 ];
 
 export const EditorProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [blocks, setBlocks] = useState<EditorBlock[]>(initialBlocks);
+  const [blocks, setBlocks] = useState<EditorBlock[]>(initialBlocks.map(block => ({
+    ...block,
+    toggleCheckListItem: (id: string) => toggleCheckListItem(id)
+  })));
   const [focusedBlockId, setFocusedBlockId] = useState<string | null>(null);
 
   const updateBlockContent = useCallback((id: string, content: string) => {
@@ -112,6 +115,7 @@ export const EditorProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       content: '',
       moduleType: type === 'module' ? 'tft-builder' : undefined,
       moduleData: type === 'module' ? { champions: [], synergies: [] } : undefined,
+      toggleCheckListItem: (id: string) => toggleCheckListItem(id)
     };
 
     setBlocks(prevBlocks => {
@@ -130,7 +134,7 @@ export const EditorProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     setTimeout(() => {
       setFocusedBlockId(newBlock.id);
     }, 0);
-  }, []);
+  }, [toggleCheckListItem]);
 
   const deleteBlock = useCallback((id: string) => {
     setBlocks(prevBlocks => {

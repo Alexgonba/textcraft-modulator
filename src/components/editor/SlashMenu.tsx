@@ -1,6 +1,12 @@
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Command } from "@/components/ui/command";
+import { 
+  Command,
+  CommandInput,
+  CommandList,
+  CommandEmpty,
+  CommandItem
+} from "@/components/ui/command";
 import { 
   Type, Heading1, Heading2, Heading3, List, ListOrdered, 
   CheckSquare, Quote, Code, Image, Youtube, Twitch, Instagram, 
@@ -104,16 +110,16 @@ const SlashMenu: React.FC<SlashMenuProps> = ({ position, onSelect, onClose }) =>
       }}
     >
       <Command>
-        <Command.Input 
+        <CommandInput 
           placeholder="Search for a block type..." 
           value={query}
           onValueChange={setQuery}
           autoFocus
         />
-        <Command.List className="max-h-64 overflow-auto">
-          <Command.Empty>No results found.</Command.Empty>
+        <CommandList className="max-h-64 overflow-auto">
+          <CommandEmpty>No results found.</CommandEmpty>
           {filteredOptions.map((option, index) => (
-            <Command.Item
+            <CommandItem
               key={option.label}
               onSelect={() => onSelect(option.type)}
               className={`flex items-center px-3 py-2 text-sm cursor-pointer ${
@@ -127,9 +133,9 @@ const SlashMenu: React.FC<SlashMenuProps> = ({ position, onSelect, onClose }) =>
                 <span className="font-medium">{option.label}</span>
                 <span className="text-xs text-muted-foreground">{option.description}</span>
               </div>
-            </Command.Item>
+            </CommandItem>
           ))}
-        </Command.List>
+        </CommandList>
       </Command>
     </div>
   );

@@ -50,18 +50,24 @@ const TextFormatToolbar: React.FC<TextFormatToolbarProps> = ({
   const isBlockType = (type: BlockType) => currentBlockType === type;
 
   const handleClickOutside = (e: React.MouseEvent) => {
-    const target = e.target as Node;
-    if (target && !target.closest('.text-format-toolbar')) {
+    if ((e.target as HTMLElement).closest('.text-format-toolbar') === null) {
       onClose();
     }
   };
 
   React.useEffect(() => {
-    document.addEventListener('mousedown', handleClickOutside as any);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside as any);
+    const handleMouseDown = (e: MouseEvent) => {
+      if (document.querySelector('.text-format-toolbar') && 
+          !(e.target as HTMLElement).closest('.text-format-toolbar')) {
+        onClose();
+      }
     };
-  }, []);
+
+    document.addEventListener('mousedown', handleMouseDown);
+    return () => {
+      document.removeEventListener('mousedown', handleMouseDown);
+    };
+  }, [onClose]);
 
   return (
     <div
