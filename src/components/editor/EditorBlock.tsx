@@ -1,13 +1,15 @@
+
 import React, { useRef, useState, useEffect } from 'react';
 import { useEditor, BlockType, EditorBlock as EditorBlockType } from './EditorContext';
-import { 
-  GripVertical, Plus, Trash2, Heading1, Heading2, Heading3, 
-  List, ListOrdered, CheckSquare, Quote, Code, Type, Check
-} from 'lucide-react';
+import { getBlockStyling } from './utils/blockUtils';
+import BlockControls from './blocks/BlockControls';
+import CheckListBlock from './blocks/CheckListBlock';
+import DefaultBlock from './blocks/DefaultBlock';
+import ModuleBlock from './blocks/ModuleBlock';
+import BlockSeparator from './blocks/BlockSeparator';
 import TextFormatToolbar from './TextFormatToolbar';
 import SlashMenu from './SlashMenu';
 import FloatingMenu from './FloatingMenu';
-import TFTTeamBuilder from '../modules/TFTTeamBuilder';
 
 interface EditorBlockProps {
   block: EditorBlockType;
@@ -198,106 +200,37 @@ const EditorBlock: React.FC<EditorBlockProps> = ({
     setShowFloatingMenu(false);
   };
 
-  const renderModule = () => {
-    switch(block.moduleType) {
-      case 'tft-builder':
-        return <TFTTeamBuilder blockId={block.id} moduleData={block.moduleData} />;
-      case 'lol-champions':
-        return <div className="p-4 bg-secondary rounded-lg text-center">LoL Champions Overview Module (Coming Soon)</div>;
-      case 'valorant-agents':
-        return <div className="p-4 bg-secondary rounded-lg text-center">Valorant Agents Guide Module (Coming Soon)</div>;
-      case 'bg3-builder':
-        return <div className="p-4 bg-secondary rounded-lg text-center">Baldur's Gate Character Builder (Coming Soon)</div>;
-      case 'youtube':
-        return <div className="p-4 bg-secondary rounded-lg text-center">YouTube Video Embed (Coming Soon)</div>;
-      case 'twitch':
-        return <div className="p-4 bg-secondary rounded-lg text-center">Twitch Stream Embed (Coming Soon)</div>;
-      case 'instagram':
-        return <div className="p-4 bg-secondary rounded-lg text-center">Instagram Post Embed (Coming Soon)</div>;
-      default:
-        return <div className="p-4 bg-secondary rounded-lg text-center">Unknown module type</div>;
-    }
-  };
-
   const renderBlockContent = () => {
     switch (block.type) {
       case 'module':
-        return renderModule();
+        return <ModuleBlock block={block} />;
       case 'divider':
         return <hr className="my-4 border-border" />;
       case 'check-list':
         return (
-          <div className="flex items-start gap-2">
-            <button 
-              onClick={() => toggleCheckListItem(block.id)}
-              className="mt-1.5 text-muted-foreground hover:text-primary transition-colors"
-            >
-              {block.checked ? <Check size={16} /> : <div className="w-4 h-4 border border-muted-foreground rounded" />}
-            </button>
-            <div
-              ref={contentRef}
-              contentEditable
-              suppressContentEditableWarning
-              className="outline-none flex-1"
-              onInput={handleContentChange}
-              onKeyDown={handleKeyDown}
-              onFocus={handleFocus}
-              onBlur={handleBlur}
-              onMouseUp={handleMouseUp}
-              dangerouslySetInnerHTML={{ __html: block.content }}
-            />
-          </div>
+          <CheckListBlock 
+            block={block}
+            contentRef={contentRef}
+            toggleCheckListItem={toggleCheckListItem}
+            handleContentChange={handleContentChange}
+            handleKeyDown={handleKeyDown}
+            handleFocus={handleFocus}
+            handleBlur={handleBlur}
+            handleMouseUp={handleMouseUp}
+          />
         );
       default:
         return (
-          <div
-            ref={contentRef}
-            contentEditable
-            suppressContentEditableWarning
-            className="outline-none w-full"
-            onInput={handleContentChange}
-            onKeyDown={handleKeyDown}
-            onFocus={handleFocus}
-            onBlur={handleBlur}
-            onMouseUp={handleMouseUp}
-            dangerouslySetInnerHTML={{ __html: block.content }}
+          <DefaultBlock 
+            contentRef={contentRef}
+            block={block}
+            handleContentChange={handleContentChange}
+            handleKeyDown={handleKeyDown}
+            handleFocus={handleFocus}
+            handleBlur={handleBlur}
+            handleMouseUp={handleMouseUp}
           />
         );
-    }
-  };
-
-  const getBlockStyling = () => {
-    switch (block.type) {
-      case 'heading-1':
-        return 'text-3xl font-bold';
-      case 'heading-2':
-        return 'text-2xl font-bold';
-      case 'heading-3':
-        return 'text-xl font-bold';
-      case 'bullet-list':
-        return 'list-disc ml-6';
-      case 'ordered-list':
-        return 'list-decimal ml-6';
-      case 'blockquote':
-        return 'pl-4 border-l-2 border-primary/50 italic';
-      case 'code':
-        return 'font-mono bg-secondary p-4 rounded';
-      default:
-        return '';
-    }
-  };
-
-  const getBlockIcon = () => {
-    switch (block.type) {
-      case 'heading-1': return <Heading1 size={14} />;
-      case 'heading-2': return <Heading2 size={14} />;
-      case 'heading-3': return <Heading3 size={14} />;
-      case 'bullet-list': return <List size={14} />;
-      case 'ordered-list': return <ListOrdered size={14} />;
-      case 'check-list': return <CheckSquare size={14} />;
-      case 'blockquote': return <Quote size={14} />;
-      case 'code': return <Code size={14} />;
-      default: return <Type size={14} />;
     }
   };
 
@@ -321,41 +254,16 @@ const EditorBlock: React.FC<EditorBlockProps> = ({
           setIsHovering(false);
         }}
       >
-        <div className="editor-block-menu">
-          <div className="flex flex-col items-center gap-1">
-            <button 
-              className="drag-handle p-1 rounded-full bg-secondary hover:bg-muted text-muted-foreground"
-              title="Drag to reorder"
-            >
-              <GripVertical size={14} />
-            </button>
-            <button 
-              className="p-1 rounded-full bg-secondary hover:bg-destructive hover:text-destructive-foreground text-muted-foreground"
-              onClick={() => deleteBlock(block.id)}
-              title="Delete block"
-            >
-              <Trash2 size={14} />
-            </button>
-            <div className="bg-muted text-muted-foreground p-1 rounded-full">
-              {getBlockIcon()}
-            </div>
-          </div>
-        </div>
+        <BlockControls
+          isHovering={isHovering}
+          deleteBlock={deleteBlock}
+          blockId={block.id}
+          blockType={block.type}
+          handlePlusButtonClick={handlePlusButtonClick}
+        />
 
-        <div className={`${getBlockStyling()}`}>
+        <div className={`${getBlockStyling(block.type)}`}>
           {renderBlockContent()}
-        </div>
-
-        <div 
-          className={`absolute right-2 top-1/2 transform -translate-y-1/2 ${isHovering ? 'opacity-100' : 'opacity-0'} transition-opacity`}
-        >
-          <button 
-            className="p-1 rounded-full bg-primary text-primary-foreground hover:bg-primary/80 transition-colors"
-            onClick={handlePlusButtonClick}
-            title="Add content"
-          >
-            <Plus size={16} />
-          </button>
         </div>
 
         {showFloatingMenu && isEmptyBlock && (
@@ -381,20 +289,11 @@ const EditorBlock: React.FC<EditorBlockProps> = ({
         )}
       </div>
 
-      <div 
-        className="editor-block-separator h-2 relative" 
-        onMouseEnter={() => setShowPlusButton(true)}
-        onMouseLeave={() => setShowPlusButton(false)}
-      >
-        {showPlusButton && (
-          <button
-            className="editor-plus-menu-button"
-            onClick={handlePlusButtonClick}
-          >
-            <Plus size={16} />
-          </button>
-        )}
-      </div>
+      <BlockSeparator 
+        showPlusButton={showPlusButton}
+        setShowPlusButton={setShowPlusButton}
+        handlePlusButtonClick={handlePlusButtonClick}
+      />
 
       {showSlashMenu && (
         <SlashMenu
