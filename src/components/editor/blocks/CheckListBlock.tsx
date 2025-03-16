@@ -37,6 +37,7 @@ const CheckListBlock: React.FC<CheckListBlockProps> = ({
         contentEditable
         suppressContentEditableWarning
         className="outline-none flex-1"
+        style={{ direction: 'ltr', textAlign: 'left' }}
         onInput={handleContentChange}
         onKeyDown={handleKeyDown}
         onFocus={handleFocus}

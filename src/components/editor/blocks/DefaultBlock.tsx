@@ -27,6 +27,7 @@ const DefaultBlock: React.FC<DefaultBlockProps> = ({
       contentEditable
       suppressContentEditableWarning
       className="outline-none w-full"
+      style={{ direction: 'ltr', textAlign: 'left' }}
       onInput={handleContentChange}
       onKeyDown={handleKeyDown}
       onFocus={handleFocus}

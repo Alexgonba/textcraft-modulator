@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -171,7 +170,7 @@
 }
 
 .editor-block:focus-within {
-  @apply ring-1 ring-editor-active bg-editor-hover;
+  @apply ring-1 ring-editor-active/40 bg-editor-hover/70;
 }
 
 .editor-block-menu {
