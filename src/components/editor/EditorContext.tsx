@@ -1,109 +1,25 @@
-
 import React, { createContext, useContext, useState, useCallback } from 'react';
-import { v4 as uuidv4 } from 'uuid';
-
-// Define types for our editor
-export type BlockType = 
-  | 'paragraph' 
-  | 'heading-1' 
-  | 'heading-2' 
-  | 'heading-3' 
-  | 'bullet-list' 
-  | 'ordered-list'
-  | 'check-list'
-  | 'blockquote'
-  | 'code'
-  | 'image'
-  | 'video'
-  | 'module'
-  | 'divider'
-  | 'showSlashMenu'; // Special type for UX only, not a real block type
-
-export interface EditorBlock {
-  id: string;
-  type: BlockType;
-  content: string;
-  moduleType?: string;
-  moduleData?: any;
-  checked?: boolean;
-}
-
-interface EditorContextType {
-  blocks: EditorBlock[];
-  focusedBlockId: string | null;
-  setFocusedBlockId: (id: string | null) => void;
-  updateBlockContent: (id: string, content: string) => void;
-  addBlock: (type: BlockType, afterId?: string, moduleType?: string) => void;
-  deleteBlock: (id: string) => void;
-  changeBlockType: (id: string, newType: BlockType, moduleType?: string) => void;
-  moveBlockUp: (id: string) => void;
-  moveBlockDown: (id: string) => void;
-  reorderBlocks: (startIndex: number, endIndex: number) => void;
-  toggleCheckListItem: (id: string) => void;
-  updateModuleData: (id: string, moduleData: any) => void;
-}
+import { EditorContextType, EditorProviderProps, EditorBlock, BlockType } from './types';
+import { initialBlocks } from './defaultBlocks';
+import { 
+  createNewBlock, 
+  insertBlockAfter, 
+  removeBlock, 
+  updateBlock, 
+  moveBlock, 
+  reorderBlockList,
+  createDefaultModuleData,
+  createDefaultVideoData
+} from './editorUtils';
 
 const EditorContext = createContext<EditorContextType | undefined>(undefined);
 
-// Initial blocks with a welcome message
-const initialBlocks: EditorBlock[] = [
-  {
-    id: uuidv4(),
-    type: 'heading-1',
-    content: 'Welcome to MultiGame Editor',
-  },
-  {
-    id: uuidv4(),
-    type: 'paragraph',
-    content: 'This is a versatile, feature-rich text editor with a modular system that supports multiple games and content types.',
-  },
-  {
-    id: uuidv4(),
-    type: 'heading-2',
-    content: 'Getting Started',
-  },
-  {
-    id: uuidv4(),
-    type: 'paragraph',
-    content: 'Click anywhere to start typing, or use the + button to add new content.',
-  },
-  {
-    id: uuidv4(),
-    type: 'bullet-list',
-    content: 'Try formatting your text with the toolbar that appears when you select text.',
-  },
-  {
-    id: uuidv4(),
-    type: 'bullet-list',
-    content: 'Use the slash command by typing / to access quick actions.',
-  },
-  {
-    id: uuidv4(),
-    type: 'bullet-list',
-    content: 'Try the new contextual editing - when a line is empty, a small menu will appear.',
-  },
-  {
-    id: uuidv4(),
-    type: 'heading-2',
-    content: 'Game Modules',
-  },
-  {
-    id: uuidv4(),
-    type: 'paragraph',
-    content: 'Try out different game modules by clicking the + button or using the slash command. Each game has its own specific modules.',
-  },
-];
-
-export const EditorProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const EditorProvider: React.FC<EditorProviderProps> = ({ children }) => {
   const [blocks, setBlocks] = useState<EditorBlock[]>(initialBlocks);
   const [focusedBlockId, setFocusedBlockId] = useState<string | null>(null);
 
   const updateBlockContent = useCallback((id: string, content: string) => {
-    setBlocks(prevBlocks => 
-      prevBlocks.map(block => 
-        block.id === id ? { ...block, content } : block
-      )
-    );
+    setBlocks(prevBlocks => updateBlock(prevBlocks, id, { content }));
   }, []);
 
   const toggleCheckListItem = useCallback((id: string) => {
@@ -115,62 +31,9 @@ export const EditorProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   }, []);
 
   const addBlock = useCallback((type: BlockType, afterId?: string, moduleType?: string) => {
-    // Set default moduleData based on moduleType
-    let defaultModuleData;
+    const newBlock = createNewBlock(type, moduleType);
     
-    if (type === 'module') {
-      switch(moduleType) {
-        case 'tft-builder':
-          defaultModuleData = { champions: [], synergies: [] };
-          break;
-        case 'lol-champions':
-          defaultModuleData = { champions: [], roles: [] };
-          break;
-        case 'valorant-agents':
-          defaultModuleData = { agents: [], roles: [] };
-          break;
-        case 'bg3-builder':
-          defaultModuleData = { character: {}, abilities: [] };
-          break;
-        default:
-          defaultModuleData = {};
-      }
-    } else if (type === 'video') {
-      switch(moduleType) {
-        case 'youtube':
-          defaultModuleData = { videoId: '', title: '' };
-          break;
-        case 'twitch':
-          defaultModuleData = { channelId: '' };
-          break;
-        case 'instagram':
-          defaultModuleData = { postId: '' };
-          break;
-        default:
-          defaultModuleData = {};
-      }
-    }
-
-    const newBlock: EditorBlock = {
-      id: uuidv4(),
-      type,
-      content: '',
-      moduleType: (type === 'module' || type === 'video') ? moduleType : undefined,
-      moduleData: (type === 'module' || type === 'video') ? defaultModuleData : undefined,
-    };
-
-    setBlocks(prevBlocks => {
-      if (!afterId) {
-        return [...prevBlocks, newBlock];
-      }
-
-      const index = prevBlocks.findIndex(block => block.id === afterId);
-      if (index === -1) return [...prevBlocks, newBlock];
-
-      const newBlocks = [...prevBlocks];
-      newBlocks.splice(index + 1, 0, newBlock);
-      return newBlocks;
-    });
+    setBlocks(prevBlocks => insertBlockAfter(prevBlocks, newBlock, afterId));
 
     setTimeout(() => {
       setFocusedBlockId(newBlock.id);
@@ -179,11 +42,8 @@ export const EditorProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
   const deleteBlock = useCallback((id: string) => {
     setBlocks(prevBlocks => {
-      // Don't delete the last block
-      if (prevBlocks.length <= 1) return prevBlocks;
-      
       const index = prevBlocks.findIndex(block => block.id === id);
-      const newBlocks = prevBlocks.filter(block => block.id !== id);
+      const newBlocks = removeBlock(prevBlocks, id);
       
       // Set focus to the block that will now be at the position of the deleted block,
       // or the last block if we're deleting the last block
@@ -202,25 +62,8 @@ export const EditorProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         if (block.id === id) {
           // If changing to a module type, set appropriate moduleType and data
           if (newType === 'module') {
-            let defaultModuleData;
             const actualModuleType = moduleType || 'tft-builder';
-            
-            switch(actualModuleType) {
-              case 'tft-builder':
-                defaultModuleData = { champions: [], synergies: [] };
-                break;
-              case 'lol-champions':
-                defaultModuleData = { champions: [], roles: [] };
-                break;
-              case 'valorant-agents':
-                defaultModuleData = { agents: [], roles: [] };
-                break;
-              case 'bg3-builder':
-                defaultModuleData = { character: {}, abilities: [] };
-                break;
-              default:
-                defaultModuleData = {};
-            }
+            const defaultModuleData = createDefaultModuleData(actualModuleType);
             
             return { 
               ...block, 
@@ -232,22 +75,8 @@ export const EditorProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           
           // If changing to a video type
           if (newType === 'video') {
-            let defaultModuleData;
             const actualModuleType = moduleType || 'youtube';
-            
-            switch(actualModuleType) {
-              case 'youtube':
-                defaultModuleData = { videoId: '', title: '' };
-                break;
-              case 'twitch':
-                defaultModuleData = { channelId: '' };
-                break;
-              case 'instagram':
-                defaultModuleData = { postId: '' };
-                break;
-              default:
-                defaultModuleData = {};
-            }
+            const defaultModuleData = createDefaultVideoData(actualModuleType);
             
             return { 
               ...block, 
@@ -266,48 +95,19 @@ export const EditorProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   }, []);
 
   const moveBlockUp = useCallback((id: string) => {
-    setBlocks(prevBlocks => {
-      const index = prevBlocks.findIndex(block => block.id === id);
-      if (index <= 0) return prevBlocks;
-
-      const newBlocks = [...prevBlocks];
-      const temp = newBlocks[index];
-      newBlocks[index] = newBlocks[index - 1];
-      newBlocks[index - 1] = temp;
-
-      return newBlocks;
-    });
+    setBlocks(prevBlocks => moveBlock(prevBlocks, id, 'up'));
   }, []);
 
   const moveBlockDown = useCallback((id: string) => {
-    setBlocks(prevBlocks => {
-      const index = prevBlocks.findIndex(block => block.id === id);
-      if (index === -1 || index >= prevBlocks.length - 1) return prevBlocks;
-
-      const newBlocks = [...prevBlocks];
-      const temp = newBlocks[index];
-      newBlocks[index] = newBlocks[index + 1];
-      newBlocks[index + 1] = temp;
-
-      return newBlocks;
-    });
+    setBlocks(prevBlocks => moveBlock(prevBlocks, id, 'down'));
   }, []);
 
   const reorderBlocks = useCallback((startIndex: number, endIndex: number) => {
-    setBlocks(prevBlocks => {
-      const result = Array.from(prevBlocks);
-      const [removed] = result.splice(startIndex, 1);
-      result.splice(endIndex, 0, removed);
-      return result;
-    });
+    setBlocks(prevBlocks => reorderBlockList(prevBlocks, startIndex, endIndex));
   }, []);
 
   const updateModuleData = useCallback((id: string, moduleData: any) => {
-    setBlocks(prevBlocks => 
-      prevBlocks.map(block => 
-        block.id === id ? { ...block, moduleData } : block
-      )
-    );
+    setBlocks(prevBlocks => updateBlock(prevBlocks, id, { moduleData }));
   }, []);
 
   const value = {
@@ -339,3 +139,6 @@ export const useEditor = () => {
   }
   return context;
 };
+
+// Re-export types for convenience
+export type { BlockType, EditorBlock } from './types';
