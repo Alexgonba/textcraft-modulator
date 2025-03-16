@@ -36,8 +36,20 @@ const FloatingMenu: React.FC<FloatingMenuProps> = ({
   // Use a subset of options for the floating menu
   const items = baseBlockOptions.slice(0, 7).concat([
     baseBlockOptions.find(option => option.type === 'image')!,
-    { icon: baseBlockOptions.find(option => option.type === 'code')!.icon, type: 'video' as BlockType, label: 'Video', moduleType: 'youtube' },
-    { icon: baseBlockOptions.find(option => option.type === 'image')!.icon, type: 'module' as BlockType, label: 'Game Module', moduleType: 'tft-builder' },
+    { 
+      icon: baseBlockOptions.find(option => option.type === 'code')!.icon, 
+      type: 'video' as BlockType, 
+      label: 'Video', 
+      moduleType: 'youtube',
+      description: 'Add a YouTube video'
+    },
+    { 
+      icon: baseBlockOptions.find(option => option.type === 'image')!.icon, 
+      type: 'module' as BlockType, 
+      label: 'Game Module', 
+      moduleType: 'tft-builder',
+      description: 'Add a game-specific module'
+    },
   ]);
 
   return (
