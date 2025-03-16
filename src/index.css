@@ -166,11 +166,11 @@
 }
 
 .editor-block:hover {
-  @apply bg-editor-hover;
+  @apply bg-editor-hover/60;
 }
 
 .editor-block:focus-within {
-  @apply ring-1 ring-editor-active/40 bg-editor-hover/70;
+  @apply ring-1 ring-editor-active/30 bg-editor-hover/40;
 }
 
 .editor-block-menu {

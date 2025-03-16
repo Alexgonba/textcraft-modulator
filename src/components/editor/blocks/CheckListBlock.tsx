@@ -24,6 +24,14 @@ const CheckListBlock: React.FC<CheckListBlockProps> = ({
   handleBlur,
   handleMouseUp,
 }) => {
+  // Force left-to-right text direction and remove any custom styling
+  // that might interfere with cursor positioning
+  const blockStyles = {
+    direction: 'ltr' as const,
+    textAlign: 'left' as const, 
+    unicodeBidi: 'isolate' as const,
+  };
+  
   return (
     <div className="flex items-start gap-2">
       <button 
@@ -37,7 +45,7 @@ const CheckListBlock: React.FC<CheckListBlockProps> = ({
         contentEditable
         suppressContentEditableWarning
         className="outline-none flex-1"
-        style={{ direction: 'ltr', textAlign: 'left' }}
+        style={blockStyles}
         onInput={handleContentChange}
         onKeyDown={handleKeyDown}
         onFocus={handleFocus}

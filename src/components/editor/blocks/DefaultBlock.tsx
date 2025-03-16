@@ -21,13 +21,21 @@ const DefaultBlock: React.FC<DefaultBlockProps> = ({
   handleBlur,
   handleMouseUp,
 }) => {
+  // Force left-to-right text direction and remove any custom styling
+  // that might interfere with cursor positioning
+  const blockStyles = {
+    direction: 'ltr' as const,
+    textAlign: 'left' as const,
+    unicodeBidi: 'isolate' as const,
+  };
+
   return (
     <div
       ref={contentRef}
       contentEditable
       suppressContentEditableWarning
       className="outline-none w-full"
-      style={{ direction: 'ltr', textAlign: 'left' }}
+      style={blockStyles}
       onInput={handleContentChange}
       onKeyDown={handleKeyDown}
       onFocus={handleFocus}
