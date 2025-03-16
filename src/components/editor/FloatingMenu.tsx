@@ -1,10 +1,8 @@
 
 import React, { useRef, useEffect } from 'react';
-import { 
-  Plus, Type, Heading1, Heading2, Image, List, 
-  ListOrdered, Quote, Code, Youtube, Gamepad2
-} from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { BlockType } from './EditorContext';
+import { baseBlockOptions } from './menu/MenuOptions';
 
 interface FloatingMenuProps {
   position: { x: number; y: number };
@@ -35,18 +33,12 @@ const FloatingMenu: React.FC<FloatingMenuProps> = ({
     };
   }, [onClose]);
 
-  const items = [
-    { icon: <Type size={16} />, type: 'paragraph' as BlockType, label: 'Text' },
-    { icon: <Heading1 size={16} />, type: 'heading-1' as BlockType, label: 'Heading 1' },
-    { icon: <Heading2 size={16} />, type: 'heading-2' as BlockType, label: 'Heading 2' },
-    { icon: <List size={16} />, type: 'bullet-list' as BlockType, label: 'Bullet List' },
-    { icon: <ListOrdered size={16} />, type: 'ordered-list' as BlockType, label: 'Numbered List' },
-    { icon: <Quote size={16} />, type: 'blockquote' as BlockType, label: 'Quote' },
-    { icon: <Code size={16} />, type: 'code' as BlockType, label: 'Code' },
-    { icon: <Image size={16} />, type: 'image' as BlockType, label: 'Image' },
-    { icon: <Youtube size={16} />, type: 'video' as BlockType, label: 'Video', moduleType: 'youtube' },
-    { icon: <Gamepad2 size={16} />, type: 'module' as BlockType, label: 'Game Module', moduleType: 'tft-builder' },
-  ];
+  // Use a subset of options for the floating menu
+  const items = baseBlockOptions.slice(0, 7).concat([
+    baseBlockOptions.find(option => option.type === 'image')!,
+    { icon: baseBlockOptions.find(option => option.type === 'code')!.icon, type: 'video' as BlockType, label: 'Video', moduleType: 'youtube' },
+    { icon: baseBlockOptions.find(option => option.type === 'image')!.icon, type: 'module' as BlockType, label: 'Game Module', moduleType: 'tft-builder' },
+  ]);
 
   return (
     <div
