@@ -12,7 +12,7 @@ import {
 import { 
   Type, Heading1, Heading2, Heading3, List, ListOrdered, 
   CheckSquare, Quote, Code, Image, Youtube, Twitch, Instagram, 
-  Gamepad2, Minus, Layout, Book, Dices, Chess, Swords, Target
+  Gamepad2, Minus, Layout, Book, Dices, Swords, Target
 } from 'lucide-react';
 import { BlockType } from './EditorContext';
 import { useGame } from './GameContext';
@@ -57,7 +57,7 @@ const mediaOptions: MenuOption[] = [
 // Game-specific module options
 const gameModuleOptions: MenuOption[] = [
   { 
-    icon: <Chess size={18} />, 
+    icon: <Gamepad2 size={18} />, // Changed from Chess to Gamepad2
     label: 'TFT Team Comp Builder', 
     type: 'module', 
     description: 'Insert TFT team builder module',

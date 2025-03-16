@@ -8,14 +8,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Chess, Swords, Target, Dices, Gamepad2 } from 'lucide-react';
+import { Gamepad2, Swords, Target, Dices } from 'lucide-react';
 
 const GameSelector = () => {
   const { selectedGame, setSelectedGame, isGameRequired } = useGame();
 
   const getGameIcon = (iconName: string) => {
     switch (iconName) {
-      case 'chess': return <Chess className="h-4 w-4" />;
+      case 'chess': return <Gamepad2 className="h-4 w-4" />; // Changed from Chess to Gamepad2
       case 'swords': return <Swords className="h-4 w-4" />;
       case 'target': return <Target className="h-4 w-4" />;
       case 'dices': return <Dices className="h-4 w-4" />;
