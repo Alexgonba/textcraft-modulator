@@ -30,22 +30,22 @@ export const getBlockStyling = (blockType: BlockType): string => {
 export const getBlockIcon = (blockType: BlockType): React.ReactNode => {
   switch (blockType) {
     case 'heading-1': 
-      return <Heading1 size={14} />;
+      return React.createElement(Heading1, { size: 14 });
     case 'heading-2': 
-      return <Heading2 size={14} />;
+      return React.createElement(Heading2, { size: 14 });
     case 'heading-3': 
-      return <Heading3 size={14} />;
+      return React.createElement(Heading3, { size: 14 });
     case 'bullet-list': 
-      return <List size={14} />;
+      return React.createElement(List, { size: 14 });
     case 'ordered-list': 
-      return <ListOrdered size={14} />;
+      return React.createElement(ListOrdered, { size: 14 });
     case 'check-list': 
-      return <CheckSquare size={14} />;
+      return React.createElement(CheckSquare, { size: 14 });
     case 'blockquote': 
-      return <Quote size={14} />;
+      return React.createElement(Quote, { size: 14 });
     case 'code': 
-      return <Code size={14} />;
+      return React.createElement(Code, { size: 14 });
     default: 
-      return <Type size={14} />;
+      return React.createElement(Type, { size: 14 });
   }
 };
