@@ -1,0 +1,16 @@
+
+/* Fix for text direction in inputs and contenteditable elements */
+input, 
+textarea, 
+[contenteditable="true"] {
+  direction: ltr !important;
+  unicode-bidi: bidi-override !important;
+  text-align: left !important;
+}
+
+/* Ensure caret positioning is correct */
+input:focus, 
+textarea:focus, 
+[contenteditable="true"]:focus {
+  caret-color: currentColor !important;
+}

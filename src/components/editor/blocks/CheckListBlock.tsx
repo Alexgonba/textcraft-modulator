@@ -24,12 +24,11 @@ const CheckListBlock: React.FC<CheckListBlockProps> = ({
   handleBlur,
   handleMouseUp,
 }) => {
-  // Force left-to-right text direction and remove any custom styling
-  // that might interfere with cursor positioning
+  // Configuración explícita para asegurar dirección correcta del texto
   const blockStyles = {
     direction: 'ltr' as const,
     textAlign: 'left' as const, 
-    unicodeBidi: 'isolate' as const,
+    unicodeBidi: 'bidi-override' as const,
   };
   
   return (
