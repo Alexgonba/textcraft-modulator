@@ -21,11 +21,11 @@ const DefaultBlock: React.FC<DefaultBlockProps> = ({
   handleBlur,
   handleMouseUp,
 }) => {
-  // Configuración explícita para asegurar dirección correcta del texto
+  // Simplified styling for text direction
   const blockStyles = {
     direction: 'ltr' as const,
     textAlign: 'left' as const,
-    unicodeBidi: 'bidi-override' as const,
+    // Removed unicodeBidi which may cause cursor positioning issues
   };
 
   return (

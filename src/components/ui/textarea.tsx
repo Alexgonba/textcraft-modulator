@@ -16,8 +16,8 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
         )}
         style={{
           direction: 'ltr',
-          unicodeBidi: 'bidi-override',
           textAlign: 'left',
+          // Removed unicodeBidi which may cause cursor positioning issues
           ...style
         }}
         ref={ref}

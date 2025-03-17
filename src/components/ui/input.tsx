@@ -14,8 +14,8 @@ const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<"input">>(
         )}
         style={{
           direction: 'ltr',
-          unicodeBidi: 'bidi-override',
           textAlign: 'left',
+          // Removed unicodeBidi which may cause cursor positioning issues
           ...style
         }}
         ref={ref}

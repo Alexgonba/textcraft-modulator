@@ -4,8 +4,8 @@ input,
 textarea, 
 [contenteditable="true"] {
   direction: ltr !important;
-  unicode-bidi: bidi-override !important;
   text-align: left !important;
+  /* Remove bidi-override as it might be causing cursor position issues */
 }
 
 /* Ensure caret positioning is correct */
