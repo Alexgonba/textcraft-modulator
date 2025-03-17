@@ -14,6 +14,8 @@ interface DraggableBlockProps {
   onDragStart: (e: React.DragEvent, index: number) => void;
   onDragOver: (e: React.DragEvent, index: number) => void;
   onDrop: () => void;
+  isDragging: boolean;
+  isDropTarget: boolean;
 }
 
 const DraggableBlock: React.FC<DraggableBlockProps> = ({
@@ -21,7 +23,9 @@ const DraggableBlock: React.FC<DraggableBlockProps> = ({
   index,
   onDragStart,
   onDragOver,
-  onDrop
+  onDrop,
+  isDragging,
+  isDropTarget
 }) => {
   const { 
     toggleCheckListItem,
@@ -84,7 +88,7 @@ const DraggableBlock: React.FC<DraggableBlockProps> = ({
         ref={blockRef}
         className={`editor-block px-3 py-2 my-0.5 ${
           focusedBlockId === block.id ? 'focused' : ''
-        }`}
+        } ${isDragging ? 'is-dragging' : ''} ${isDropTarget ? 'is-drop-target' : ''}`}
         draggable
         onDragStart={handleDragStart}
         onDragOver={handleDragOver}

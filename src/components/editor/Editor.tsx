@@ -126,15 +126,24 @@ const EditorContent = () => {
           <CardContent className="p-6">
             <div className="editor-content">
               {blocks.map((block, index) => (
-                <EditorBlock
-                  key={block.id}
-                  block={block}
-                  index={index}
-                  onDragStart={handleDragStart}
-                  onDragOver={handleDragOver}
-                  onDrop={handleDrop}
-                />
+                <React.Fragment key={block.id}>
+                  {dropTargetIndex === index && draggedIndex !== null && draggedIndex !== index && (
+                    <div className="drop-indicator" />
+                  )}
+                  <EditorBlock
+                    block={block}
+                    index={index}
+                    onDragStart={handleDragStart}
+                    onDragOver={handleDragOver}
+                    onDrop={handleDrop}
+                    isDragging={draggedIndex === index}
+                    isDropTarget={dropTargetIndex === index && draggedIndex !== index}
+                  />
+                </React.Fragment>
               ))}
+              {dropTargetIndex === blocks.length && draggedIndex !== null && (
+                <div className="drop-indicator" />
+              )}
             </div>
           </CardContent>
         </Card>

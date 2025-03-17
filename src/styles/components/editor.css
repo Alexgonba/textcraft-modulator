@@ -77,3 +77,22 @@
 .editor-block-separator:hover .editor-plus-menu-button {
   @apply opacity-100 scale-100;
 }
+
+/* Drag and drop visual improvements */
+.editor-block.is-dragging {
+  @apply opacity-70 scale-[0.98] shadow-lg z-50;
+}
+
+.editor-block.is-drop-target {
+  @apply bg-primary/10 border-2 border-dashed border-primary/50;
+}
+
+.editor-block.is-drop-target::before {
+  content: '';
+  @apply absolute left-0 top-0 w-1 h-full bg-primary animate-pulse;
+}
+
+.drop-indicator {
+  @apply w-full h-2 bg-primary/40 rounded my-1 animate-pulse;
+}
+

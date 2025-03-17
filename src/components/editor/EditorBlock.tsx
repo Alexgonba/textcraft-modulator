@@ -9,6 +9,8 @@ interface EditorBlockProps {
   onDragStart: (e: React.DragEvent, index: number) => void;
   onDragOver: (e: React.DragEvent, index: number) => void;
   onDrop: () => void;
+  isDragging?: boolean;
+  isDropTarget?: boolean;
 }
 
 const EditorBlock: React.FC<EditorBlockProps> = ({ 
@@ -16,7 +18,9 @@ const EditorBlock: React.FC<EditorBlockProps> = ({
   index,
   onDragStart,
   onDragOver,
-  onDrop
+  onDrop,
+  isDragging = false,
+  isDropTarget = false
 }) => {
   return (
     <DraggableBlock
@@ -25,6 +29,8 @@ const EditorBlock: React.FC<EditorBlockProps> = ({
       onDragStart={onDragStart}
       onDragOver={onDragOver}
       onDrop={onDrop}
+      isDragging={isDragging}
+      isDropTarget={isDropTarget}
     />
   );
 };
