@@ -1,0 +1,22 @@
+
+@layer utilities {
+  .dark {
+    color-scheme: dark;
+  }
+  
+  .glass-panel {
+    @apply bg-secondary/50 backdrop-blur-sm border border-border rounded-lg;
+  }
+  
+  .text-gradient {
+    @apply bg-gradient-to-br from-accent via-primary to-purple-500 bg-clip-text text-transparent;
+  }
+  
+  .hover-glow {
+    @apply hover:shadow-glow transition-shadow duration-300;
+  }
+  
+  .active-glow {
+    @apply shadow-glow-strong;
+  }
+}

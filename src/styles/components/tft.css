@@ -1,0 +1,22 @@
+
+.tft-grid {
+  @apply grid gap-1;
+  grid-template-columns: repeat(7, 1fr);
+}
+
+.tft-hex {
+  @apply aspect-square bg-secondary rounded-lg border border-border flex items-center justify-center 
+         transition-all duration-200 hover:border-primary cursor-pointer;
+}
+
+.tft-hex.has-champion {
+  @apply border-primary/50;
+}
+
+.tft-hex.drag-over {
+  @apply border-primary border-2 bg-primary/20;
+}
+
+.sortable-ghost {
+  @apply opacity-30 bg-muted;
+}
