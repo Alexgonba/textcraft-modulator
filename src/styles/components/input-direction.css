@@ -23,5 +23,5 @@ textarea,
 
 /* Apply subtle focus style to contenteditable */
 [contenteditable="true"]:focus-visible {
-  border-color: rgba(var(--primary), 0.4);
+  border-color: rgba(var(--primary), 0.2);
 }
