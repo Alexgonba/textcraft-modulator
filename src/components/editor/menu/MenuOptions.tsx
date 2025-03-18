@@ -3,7 +3,8 @@ import React from 'react';
 import { 
   Type, Heading1, Heading2, Heading3, List, ListOrdered, 
   CheckSquare, Quote, Code, Image, Youtube, Twitch, Instagram, 
-  Gamepad2, Minus, Layout, Trophy, ShoppingBag, Sparkles, Zap
+  Gamepad2, Minus, Layout, Trophy, ShoppingBag, Sparkles, Zap,
+  Target, Dice // Import the missing icons
 } from 'lucide-react';
 import { BlockType } from '../EditorContext';
 
@@ -89,7 +90,7 @@ export const gameModuleOptions: MenuOption[] = [
     gameId: 'valorant'
   },
   { 
-    icon: <Dices size={18} />, 
+    icon: <Dice size={18} />, 
     label: 'Baldur\'s Gate Character Builder', 
     type: 'module', 
     description: 'Insert BG3 character builder module',
