@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from 'react';
 import { useEditor, BlockType } from '../EditorContext';
 
@@ -69,19 +68,19 @@ export const useBlockInteractions = ({
     if (contentRef.current && blockId === focusedBlockId) {
       contentRef.current.focus();
       
-      const range = document.createRange();
-      range.selectNodeContents(contentRef.current);
-      range.collapse(false);
-      const selection = window.getSelection();
-      if (selection) {
-        selection.removeAllRanges();
-        selection.addRange(range);
-      }
-      
-      const isEmpty = contentRef.current.textContent?.trim() === '';
-      setIsEmptyBlock(isEmpty);
-      
-      if (isEmpty) {
+      if (!contentRef.current.innerHTML || contentRef.current.innerHTML === '<br>') {
+        contentRef.current.innerHTML = '';
+        setIsEmptyBlock(true);
+        
+        const range = document.createRange();
+        range.selectNodeContents(contentRef.current);
+        range.collapse(false);
+        const selection = window.getSelection();
+        if (selection) {
+          selection.removeAllRanges();
+          selection.addRange(range);
+        }
+        
         const rect = contentRef.current.getBoundingClientRect();
         setFloatingMenuPosition({
           x: rect.left + 20,
@@ -93,10 +92,11 @@ export const useBlockInteractions = ({
   }, [focusedBlockId, blockId]);
 
   const handleContentChange = (e: React.FormEvent<HTMLDivElement>) => {
-    const content = e.currentTarget.textContent || '';
+    const content = e.currentTarget.innerHTML;
     updateBlockContent(blockId, content);
     
-    setIsEmptyBlock(content.trim() === '');
+    const isEmpty = content === '' || content === '<br>';
+    setIsEmptyBlock(isEmpty);
 
     if (content === '/') {
       const rect = e.currentTarget.getBoundingClientRect();
@@ -181,17 +181,22 @@ export const useBlockInteractions = ({
   const handleFocus = () => {
     setFocusedBlockId(blockId);
     
-    if ((contentRef.current?.textContent || '').trim() === '') {
-      setIsEmptyBlock(true);
-      const rect = contentRef.current?.getBoundingClientRect() || { left: 0, top: 0 };
-      setFloatingMenuPosition({
-        x: rect.left + 20,
-        y: rect.top - 10
-      });
-      setShowFloatingMenu(true);
-    } else {
-      setIsEmptyBlock(false);
-      setShowFloatingMenu(false);
+    if (contentRef.current) {
+      const content = contentRef.current.innerHTML;
+      const isEmpty = content === '' || content === '<br>';
+      
+      if (isEmpty) {
+        setIsEmptyBlock(true);
+        const rect = contentRef.current.getBoundingClientRect();
+        setFloatingMenuPosition({
+          x: rect.left + 20,
+          y: rect.top - 10
+        });
+        setShowFloatingMenu(true);
+      } else {
+        setIsEmptyBlock(false);
+        setShowFloatingMenu(false);
+      }
     }
   };
 

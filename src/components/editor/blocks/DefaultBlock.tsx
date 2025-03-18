@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { EditorBlock } from '../types';
 
 interface DefaultBlockProps {
@@ -21,26 +21,25 @@ const DefaultBlock: React.FC<DefaultBlockProps> = ({
   handleBlur,
   handleMouseUp,
 }) => {
-  // Simplified styling for text direction
-  const blockStyles = {
-    direction: 'ltr' as const,
-    textAlign: 'left' as const,
-    // Removed unicodeBidi which may cause cursor positioning issues
-  };
+  // Initialize content when block is first rendered
+  useEffect(() => {
+    if (contentRef.current) {
+      contentRef.current.innerHTML = block.content;
+    }
+  }, [block.id]);
 
+  // Don't use inline styles that might interfere with cursor positioning
   return (
     <div
       ref={contentRef}
       contentEditable
       suppressContentEditableWarning
-      className="outline-none w-full"
-      style={blockStyles}
+      className="outline-none w-full text-left"
       onInput={handleContentChange}
       onKeyDown={handleKeyDown}
       onFocus={handleFocus}
       onBlur={handleBlur}
       onMouseUp={handleMouseUp}
-      dangerouslySetInnerHTML={{ __html: block.content }}
     />
   );
 };

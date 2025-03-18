@@ -3,14 +3,18 @@
 input, 
 textarea, 
 [contenteditable="true"] {
-  direction: ltr !important;
-  text-align: left !important;
-  /* Remove bidi-override as it might be causing cursor position issues */
+  direction: ltr;
+  text-align: left;
+  /* Remove unicode-bidi completely as it causes cursor positioning issues */
 }
 
-/* Ensure caret positioning is correct */
-input:focus, 
-textarea:focus, 
+/* Ensure caret positioning works correctly */
+[contenteditable="true"] {
+  caret-color: currentColor;
+  outline: none;
+}
+
+/* Fix focus handling */
 [contenteditable="true"]:focus {
-  caret-color: currentColor !important;
+  outline: none;
 }

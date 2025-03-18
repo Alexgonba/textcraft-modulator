@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Check } from 'lucide-react';
 import { EditorBlock } from '../types';
 
@@ -24,12 +24,12 @@ const CheckListBlock: React.FC<CheckListBlockProps> = ({
   handleBlur,
   handleMouseUp,
 }) => {
-  // Simplified styling for text direction
-  const blockStyles = {
-    direction: 'ltr' as const,
-    textAlign: 'left' as const,
-    // Removed unicodeBidi which may cause cursor positioning issues
-  };
+  // Initialize content when block is first rendered
+  useEffect(() => {
+    if (contentRef.current) {
+      contentRef.current.innerHTML = block.content;
+    }
+  }, [block.id]);
   
   return (
     <div className="flex items-start gap-2">
@@ -43,14 +43,12 @@ const CheckListBlock: React.FC<CheckListBlockProps> = ({
         ref={contentRef}
         contentEditable
         suppressContentEditableWarning
-        className="outline-none flex-1"
-        style={blockStyles}
+        className="outline-none flex-1 text-left"
         onInput={handleContentChange}
         onKeyDown={handleKeyDown}
         onFocus={handleFocus}
         onBlur={handleBlur}
         onMouseUp={handleMouseUp}
-        dangerouslySetInnerHTML={{ __html: block.content }}
       />
     </div>
   );
