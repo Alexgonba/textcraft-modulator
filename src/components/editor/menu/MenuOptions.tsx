@@ -3,7 +3,7 @@ import React from 'react';
 import { 
   Type, Heading1, Heading2, Heading3, List, ListOrdered, 
   CheckSquare, Quote, Code, Image, Youtube, Twitch, Instagram, 
-  Gamepad2, Minus, Layout, Book, Dices, Swords, Target
+  Gamepad2, Minus, Layout, Trophy, ShoppingBag, Sparkles, Zap
 } from 'lucide-react';
 import { BlockType } from '../EditorContext';
 
@@ -41,7 +41,7 @@ export const mediaOptions: MenuOption[] = [
 // Game-specific module options
 export const gameModuleOptions: MenuOption[] = [
   { 
-    icon: <Gamepad2 size={18} />, // Changed from Chess to Gamepad2
+    icon: <Gamepad2 size={18} />,
     label: 'TFT Team Comp Builder', 
     type: 'module', 
     description: 'Insert TFT team builder module',
@@ -49,11 +49,35 @@ export const gameModuleOptions: MenuOption[] = [
     gameId: 'tft'
   },
   { 
-    icon: <Swords size={18} />, 
+    icon: <Trophy size={18} />, 
     label: 'LoL Champions Overview', 
     type: 'module', 
     description: 'Insert League of Legends champion overview',
     moduleType: 'lol-champions',
+    gameId: 'lol'
+  },
+  { 
+    icon: <ShoppingBag size={18} />, 
+    label: 'LoL Items', 
+    type: 'module', 
+    description: 'Insert League of Legends items module',
+    moduleType: 'lol-items',
+    gameId: 'lol'
+  },
+  { 
+    icon: <Sparkles size={18} />, 
+    label: 'LoL Runes', 
+    type: 'module', 
+    description: 'Insert League of Legends runes module',
+    moduleType: 'lol-runes',
+    gameId: 'lol'
+  },
+  { 
+    icon: <Zap size={18} />, 
+    label: 'LoL Champion Abilities', 
+    type: 'module', 
+    description: 'Insert League of Legends abilities module',
+    moduleType: 'lol-abilities',
     gameId: 'lol'
   },
   { 

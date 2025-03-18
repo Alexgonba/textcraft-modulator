@@ -1,6 +1,10 @@
 
 import React from 'react';
 import TFTTeamBuilder from '../../modules/TFTTeamBuilder';
+import LolChampionModule from '../../modules/lol/LolChampionModule';
+import LolItemModule from '../../modules/lol/LolItemModule';
+import LolRuneModule from '../../modules/lol/LolRuneModule';
+import LolAbilityModule from '../../modules/lol/LolAbilityModule';
 import { EditorBlock } from '../types';
 
 interface ModuleBlockProps {
@@ -13,7 +17,13 @@ const ModuleBlock: React.FC<ModuleBlockProps> = ({ block }) => {
       case 'tft-builder':
         return <TFTTeamBuilder blockId={block.id} moduleData={block.moduleData} />;
       case 'lol-champions':
-        return <div className="p-4 bg-secondary rounded-lg text-center">LoL Champions Overview Module (Coming Soon)</div>;
+        return <LolChampionModule blockId={block.id} moduleData={block.moduleData} />;
+      case 'lol-items':
+        return <LolItemModule blockId={block.id} moduleData={block.moduleData} />;
+      case 'lol-runes':
+        return <LolRuneModule blockId={block.id} moduleData={block.moduleData} />;
+      case 'lol-abilities':
+        return <LolAbilityModule blockId={block.id} moduleData={block.moduleData} />;
       case 'valorant-agents':
         return <div className="p-4 bg-secondary rounded-lg text-center">Valorant Agents Guide Module (Coming Soon)</div>;
       case 'bg3-builder':

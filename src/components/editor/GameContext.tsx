@@ -22,7 +22,7 @@ export const availableGames: Game[] = [
     id: 'lol',
     name: 'League of Legends',
     icon: 'swords',
-    modules: ['lol-champions'],
+    modules: ['lol-champions', 'lol-items', 'lol-runes', 'lol-abilities'],
     color: 'bg-red-500',
   },
   {

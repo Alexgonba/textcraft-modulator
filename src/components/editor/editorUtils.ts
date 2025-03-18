@@ -10,6 +10,12 @@ export const createDefaultModuleData = (moduleType: string | undefined): any => 
       return { champions: [], synergies: [] };
     case 'lol-champions':
       return { champions: [], roles: [] };
+    case 'lol-items':
+      return { items: [] };
+    case 'lol-runes':
+      return { primaryPath: null, secondaryPath: null, runes: [] };
+    case 'lol-abilities':
+      return { championId: '', abilities: [] };
     case 'valorant-agents':
       return { agents: [], roles: [] };
     case 'bg3-builder':
