@@ -43,7 +43,7 @@ const CheckListBlock: React.FC<CheckListBlockProps> = ({
         ref={contentRef}
         contentEditable
         suppressContentEditableWarning
-        className="outline-none flex-1 text-left"
+        className="outline-none flex-1 text-left focus:border-transparent focus:bg-transparent"
         onInput={handleContentChange}
         onKeyDown={handleKeyDown}
         onFocus={handleFocus}

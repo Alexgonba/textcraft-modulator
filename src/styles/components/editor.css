@@ -78,21 +78,17 @@
   @apply opacity-100 scale-100;
 }
 
-/* Drag and drop visual improvements */
+/* Drag and drop visual improvements - simplified */
 .editor-block.is-dragging {
-  @apply opacity-70 scale-[0.98] shadow-lg z-50;
+  @apply opacity-70 shadow-lg z-50;
 }
 
+/* Remove background and border styles for the drop target */
 .editor-block.is-drop-target {
-  @apply bg-primary/10 border-2 border-dashed border-primary/50;
+  @apply border-0 bg-transparent;
 }
 
-.editor-block.is-drop-target::before {
-  content: '';
-  @apply absolute left-0 top-0 w-1 h-full bg-primary animate-pulse;
-}
-
+/* Use a simple line indicator for drop target */
 .drop-indicator {
-  @apply w-full h-2 bg-primary/40 rounded my-1 animate-pulse;
+  @apply w-full h-1 bg-primary rounded my-0 animate-pulse;
 }
-

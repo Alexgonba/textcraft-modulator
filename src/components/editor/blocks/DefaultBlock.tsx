@@ -28,13 +28,12 @@ const DefaultBlock: React.FC<DefaultBlockProps> = ({
     }
   }, [block.id]);
 
-  // Don't use inline styles that might interfere with cursor positioning
   return (
     <div
       ref={contentRef}
       contentEditable
       suppressContentEditableWarning
-      className="outline-none w-full text-left"
+      className="outline-none w-full text-left focus:border-transparent focus:bg-transparent"
       onInput={handleContentChange}
       onKeyDown={handleKeyDown}
       onFocus={handleFocus}
