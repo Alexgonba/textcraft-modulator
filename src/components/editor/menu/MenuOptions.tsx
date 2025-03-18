@@ -4,7 +4,7 @@ import {
   Type, Heading1, Heading2, Heading3, List, ListOrdered, 
   CheckSquare, Quote, Code, Image, Youtube, Twitch, Instagram, 
   Gamepad2, Minus, Layout, Trophy, ShoppingBag, Sparkles, Zap,
-  Target, Dice // Import the missing icons
+  Target, Dice1 // Changed Dice to Dice1 which is available in lucide-react
 } from 'lucide-react';
 import { BlockType } from '../EditorContext';
 
@@ -90,7 +90,7 @@ export const gameModuleOptions: MenuOption[] = [
     gameId: 'valorant'
   },
   { 
-    icon: <Dice size={18} />, 
+    icon: <Dice1 size={18} />, 
     label: 'Baldur\'s Gate Character Builder', 
     type: 'module', 
     description: 'Insert BG3 character builder module',
