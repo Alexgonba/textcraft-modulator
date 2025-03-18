@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeft, Edit } from 'lucide-react';
 import { EditorBlock as Block } from '@/components/editor/EditorContext';
 import { Game } from '@/components/editor/GameContext';
+import ModuleBlock from '@/components/editor/blocks/ModuleBlock';
 
 interface PreviewContent {
   blocks: Block[];
@@ -110,12 +111,7 @@ const Preview = () => {
         }
         return <div className="p-4 border border-dashed rounded-md my-4 text-center">{block.moduleType} video placeholder</div>;
       case 'module':
-        return (
-          <div className="p-6 border rounded-md my-6 bg-muted/30">
-            <div className="font-medium mb-2">{block.moduleType} Module</div>
-            <p className="text-muted-foreground text-sm">Module content would render here</p>
-          </div>
-        );
+        return <ModuleBlock block={block} />;
       default:
         return <p className="mb-4">{block.content}</p>;
     }
@@ -153,10 +149,8 @@ const Preview = () => {
       {/* Content */}
       <main className="container max-w-4xl mx-auto py-12 px-4">
         <article className="prose lg:prose-xl dark:prose-invert max-w-none">
-          {blocks.map((block, index) => (
-            <React.Fragment key={block.id || index}>
-              {renderBlock(block)}
-            </React.Fragment>
+          {blocks.map((block) => (
+            <div key={block.id}>{renderBlock(block)}</div>
           ))}
         </article>
       </main>
