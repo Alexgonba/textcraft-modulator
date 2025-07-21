@@ -78,76 +78,117 @@ const EditorContent = () => {
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto">
-      <div className="flex justify-between items-center mb-4">
-        <div className="flex items-center gap-4">
-          <h2 className="text-xl font-bold">Document Editor</h2>
-          <GameSelector />
-        </div>
-        <div className="flex gap-2">
-          <Button 
-            variant="outline" 
-            onClick={() => addBlock('paragraph')}
-            className="flex items-center gap-1"
-            disabled={isGameRequired && !selectedGame}
-          >
-            <PlusCircle size={16} />
-            <span>Add Block</span>
-          </Button>
-          <Button 
-            variant="outline" 
-            onClick={handlePreview}
-            className="flex items-center gap-1"
-            disabled={isGameRequired && !selectedGame}
-          >
-            <Eye size={16} />
-            <span>Preview</span>
-          </Button>
-          <Button 
-            variant="default" 
-            onClick={handleSave}
-            className="flex items-center gap-1"
-            disabled={isGameRequired && !selectedGame}
-          >
-            <Save size={16} />
-            <span>Save</span>
-          </Button>
-        </div>
-      </div>
-      
-      {isGameRequired && !selectedGame ? (
-        <div className="text-center p-12 border border-dashed border-muted-foreground rounded-md bg-muted/30">
-          <h3 className="text-lg font-medium mb-2">Select a Game to Start</h3>
-          <p className="text-muted-foreground mb-4">Choose a game from the dropdown above to begin creating content.</p>
-          <GameSelector />
-        </div>
-      ) : (
-        <Card className="border border-border bg-card shadow-sm">
-          <CardContent className="p-6">
-            <div className="editor-content">
-              {blocks.map((block, index) => (
-                <React.Fragment key={block.id}>
-                  {dropTargetIndex === index && draggedIndex !== null && draggedIndex !== index && (
-                    <div className="drop-indicator" />
-                  )}
-                  <EditorBlock
-                    block={block}
-                    index={index}
-                    onDragStart={handleDragStart}
-                    onDragOver={handleDragOver}
-                    onDrop={handleDrop}
-                    isDragging={draggedIndex === index}
-                    isDropTarget={dropTargetIndex === index && draggedIndex !== index}
-                  />
-                </React.Fragment>
-              ))}
-              {dropTargetIndex === blocks.length && draggedIndex !== null && (
-                <div className="drop-indicator" />
-              )}
+    <div className="min-h-screen bg-gradient-subtle">
+      <div className="w-full max-w-5xl mx-auto px-4 py-8">
+        {/* Header */}
+        <header className="flex justify-between items-center mb-8 pb-6 border-b border-border/50">
+          <div className="flex items-center gap-6">
+            <div>
+              <h1 className="text-2xl font-semibold tracking-tight">Document Editor</h1>
+              <p className="text-muted-foreground text-sm mt-1">Create and edit your gaming content</p>
             </div>
-          </CardContent>
-        </Card>
-      )}
+            <GameSelector />
+          </div>
+          <div className="flex items-center gap-3">
+            <Button 
+              variant="ghost" 
+              size="sm"
+              onClick={() => addBlock('paragraph')}
+              disabled={isGameRequired && !selectedGame}
+              className="gap-2"
+            >
+              <PlusCircle size={16} />
+              Add Block
+            </Button>
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={handlePreview}
+              disabled={isGameRequired && !selectedGame}
+              className="gap-2"
+            >
+              <Eye size={16} />
+              Preview
+            </Button>
+            <Button 
+              variant="accent" 
+              size="sm"
+              onClick={handleSave}
+              disabled={isGameRequired && !selectedGame}
+              className="gap-2"
+            >
+              <Save size={16} />
+              Save
+            </Button>
+          </div>
+        </header>
+        
+        {/* Content */}
+        {isGameRequired && !selectedGame ? (
+          <div className="flex items-center justify-center min-h-[60vh]">
+            <div className="text-center p-12 max-w-md">
+              <div className="w-16 h-16 bg-muted rounded-2xl flex items-center justify-center mx-auto mb-6">
+                <PlusCircle className="w-8 h-8 text-muted-foreground" />
+              </div>
+              <h3 className="text-xl font-semibold mb-3">Select a Game to Start</h3>
+              <p className="text-muted-foreground mb-8 leading-relaxed">
+                Choose a game from the dropdown above to begin creating your content. 
+                Our editor supports multiple gaming platforms with specialized modules.
+              </p>
+              <GameSelector />
+            </div>
+          </div>
+        ) : (
+          <main className="space-y-6">
+            <Card className="border border-border/50 bg-card/50 backdrop-blur-sm shadow-lg">
+              <CardContent className="p-8">
+                <div className="editor-content space-y-4">
+                  {blocks.length === 0 ? (
+                    <div className="text-center py-16">
+                      <div className="w-12 h-12 bg-muted rounded-xl flex items-center justify-center mx-auto mb-4">
+                        <PlusCircle className="w-6 h-6 text-muted-foreground" />
+                      </div>
+                      <p className="text-muted-foreground mb-4">Your document is empty</p>
+                      <Button 
+                        variant="outline" 
+                        onClick={() => addBlock('paragraph')}
+                        className="gap-2"
+                      >
+                        <PlusCircle size={16} />
+                        Add your first block
+                      </Button>
+                    </div>
+                  ) : (
+                    <>
+                      {blocks.map((block, index) => (
+                        <React.Fragment key={block.id}>
+                          {dropTargetIndex === index && draggedIndex !== null && draggedIndex !== index && (
+                            <div className="h-1 bg-accent rounded-full animate-pulse mx-4" />
+                          )}
+                          <div className="group relative">
+                            <EditorBlock
+                              block={block}
+                              index={index}
+                              onDragStart={handleDragStart}
+                              onDragOver={handleDragOver}
+                              onDrop={handleDrop}
+                              isDragging={draggedIndex === index}
+                              isDropTarget={dropTargetIndex === index && draggedIndex !== index}
+                            />
+                          </div>
+                        </React.Fragment>
+                      ))}
+                      {dropTargetIndex === blocks.length && draggedIndex !== null && (
+                        <div className="h-1 bg-accent rounded-full animate-pulse mx-4" />
+                      )}
+                    </>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </main>
+        )}
+      </div>
     </div>
   );
 };

@@ -8,17 +8,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Gamepad2, Swords, Target, Dices } from 'lucide-react';
+import { Gamepad2, Swords, Target, Dice1 } from 'lucide-react';
 
 const GameSelector = () => {
   const { selectedGame, setSelectedGame, isGameRequired } = useGame();
 
   const getGameIcon = (iconName: string) => {
     switch (iconName) {
-      case 'chess': return <Gamepad2 className="h-4 w-4" />; // Changed from Chess to Gamepad2
+      case 'chess': return <Gamepad2 className="h-4 w-4" />; 
       case 'swords': return <Swords className="h-4 w-4" />;
       case 'target': return <Target className="h-4 w-4" />;
-      case 'dices': return <Dices className="h-4 w-4" />;
+      case 'dices': return <Dice1 className="h-4 w-4" />;
       default: return <Gamepad2 className="h-4 w-4" />;
     }
   };
@@ -29,21 +29,25 @@ const GameSelector = () => {
   };
 
   return (
-    <div className="flex items-center space-x-2">
-      <span className="text-sm text-muted-foreground">Game:</span>
+    <div className="flex items-center gap-3">
+      <span className="text-sm font-medium text-muted-foreground">Game:</span>
       <Select
         value={selectedGame?.id || ''}
         onValueChange={handleGameChange}
       >
-        <SelectTrigger className="w-[180px] h-9 text-sm bg-background border-input">
+        <SelectTrigger className="w-[200px] h-9 text-sm bg-background border-border hover:border-border-hover transition-colors">
           <SelectValue placeholder={isGameRequired ? "Select a game" : "Optional: Select game"} />
         </SelectTrigger>
-        <SelectContent>
+        <SelectContent className="bg-popover/95 backdrop-blur-sm border-border/50">
           {availableGames.map((game) => (
-            <SelectItem key={game.id} value={game.id} className="flex items-center gap-2">
-              <div className="flex items-center gap-2">
+            <SelectItem 
+              key={game.id} 
+              value={game.id} 
+              className="flex items-center gap-2 hover:bg-muted/50 cursor-pointer"
+            >
+              <div className="flex items-center gap-3">
                 {getGameIcon(game.icon)}
-                <span>{game.name}</span>
+                <span className="font-medium">{game.name}</span>
               </div>
             </SelectItem>
           ))}
